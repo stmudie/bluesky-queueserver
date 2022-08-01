@@ -1210,14 +1210,13 @@ class RunEngineWorker(Process):
                     logger.info(
                         "Subscribing to Kafka: topic '%s', servers '%s'",
                         self._config_dict["kafka"]["topic"],
-                        self._config_dict["kafka"]["bootstrap"],
+                        self._config_dict["kafka"]["config"]["bootstrap.servers"],
                     )
                     kafka_publisher = kafkaPublisher(
                         topic=self._config_dict["kafka"]["topic"],
-                        bootstrap_servers=self._config_dict["kafka"]["bootstrap"],
                         key="kafka-unit-test-key",
                         # work with a single broker
-                        producer_config={"acks": 1, "enable.idempotence": False, "request.timeout.ms": 5000},
+                        producer_config={"acks": 1, "enable.idempotence": False, "request.timeout.ms": 5000, **self._config_dict["kafka"]["config"]},
                         serializer=partial(msgpack.dumps, default=mpn.encode),
                     )
                     self._RE.subscribe(kafka_publisher)

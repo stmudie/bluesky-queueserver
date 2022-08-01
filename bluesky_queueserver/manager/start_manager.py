@@ -4,6 +4,7 @@ import threading
 import time as ttime
 import os
 from importlib.util import find_spec
+import json
 
 from .worker import RunEngineWorker
 from .manager import RunEngineManager
@@ -338,6 +339,7 @@ def start_manager():
         "(default: %(default)s). ",
     )
 
+    parser.add_argument("--kafka-config", dest="kafka_config", type=str, help="Load a kafka config file.")
     parser.add_argument("--kafka-topic", dest="kafka_topic", type=str, help="The kafka topic to publish to.")
     parser.add_argument(
         "--kafka-server",
@@ -502,10 +504,27 @@ def start_manager():
 
     config_worker = {}
     config_manager = {}
+    
     if args.kafka_topic is not None:
-        config_worker["kafka"] = {}
+        config_worker["kafka"] = {"config": {}}
+        if args.kafka_config is not None:
+            try:
+                with open(args.kafka_config, "r") as config_file:
+                    config_worker["kafka"]["config"] = json.load(config_file)
+            except FileNotFoundError:
+                logger.error(
+                    f"File {args.kafka_config} doesn't exist."
+                )
+                return 1
+            except json.decoder.JSONDecodeError:
+                logger.error(
+                    f"File {args.kafka_config} is not valid JSON."
+                )
+                return 1
+
         config_worker["kafka"]["topic"] = args.kafka_topic
-        config_worker["kafka"]["bootstrap"] = args.kafka_server
+        if args.kafka_server is not None:
+            config_worker["kafka"]["config"]["bootstrap.servers"] = args.kafka_server
 
     if args.zmq_data_proxy_addr is not None:
         config_worker["zmq_data_proxy_addr"] = args.zmq_data_proxy_addr
