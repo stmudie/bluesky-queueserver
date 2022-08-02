@@ -1214,6 +1214,7 @@ class RunEngineWorker(Process):
                     )
                     kafka_publisher = kafkaPublisher(
                         topic=self._config_dict["kafka"]["topic"],
+                        bootstrap_servers=self._config_dict["kafka"]["servers"]
                         key="kafka-unit-test-key",
                         # work with a single broker
                         producer_config={"acks": 1, "enable.idempotence": False, "request.timeout.ms": 5000, **self._config_dict["kafka"]["config"]},

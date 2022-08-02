@@ -506,7 +506,7 @@ def start_manager():
     config_manager = {}
     
     if args.kafka_topic is not None:
-        config_worker["kafka"] = {"config": {}}
+        config_worker["kafka"] = {"servers": "", "config": {}}
         if args.kafka_config is not None:
             try:
                 with open(args.kafka_config, "r") as config_file:
@@ -525,6 +525,7 @@ def start_manager():
         config_worker["kafka"]["topic"] = args.kafka_topic
         if args.kafka_server is not None:
             config_worker["kafka"]["config"]["bootstrap.servers"] = args.kafka_server
+        config_worker["kafka"]["servers"] = config_worker["kafka"]["config"].pop("bootstrap.servers")
 
     if args.zmq_data_proxy_addr is not None:
         config_worker["zmq_data_proxy_addr"] = args.zmq_data_proxy_addr
