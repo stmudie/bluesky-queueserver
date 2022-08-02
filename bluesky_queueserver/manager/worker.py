@@ -1210,7 +1210,7 @@ class RunEngineWorker(Process):
                     logger.info(
                         "Subscribing to Kafka: topic '%s', servers '%s'",
                         self._config_dict["kafka"]["topic"],
-                        self._config_dict["kafka"]["config"]["bootstrap.servers"],
+                        self._config_dict["kafka"]["servers"],
                     )
                     kafka_publisher = kafkaPublisher(
                         topic=self._config_dict["kafka"]["topic"],
