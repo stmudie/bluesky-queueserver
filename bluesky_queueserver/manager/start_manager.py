@@ -346,7 +346,6 @@ def start_manager():
         dest="kafka_server",
         type=str,
         help="Bootstrap server to connect (default: %(default)s).",
-        default="127.0.0.1:9092",
     )
 
     parser.add_argument(
@@ -525,7 +524,10 @@ def start_manager():
         config_worker["kafka"]["topic"] = args.kafka_topic
         if args.kafka_server is not None:
             config_worker["kafka"]["config"]["bootstrap.servers"] = args.kafka_server
-        config_worker["kafka"]["servers"] = config_worker["kafka"]["config"].pop("bootstrap.servers")
+        try:
+            config_worker["kafka"]["servers"] = config_worker["kafka"]["config"].pop("bootstrap.servers")
+        except KeyError:
+            config_worker["kafka"]["servers"] = "127.0.0.1:9092"
 
     if args.zmq_data_proxy_addr is not None:
         config_worker["zmq_data_proxy_addr"] = args.zmq_data_proxy_addr
